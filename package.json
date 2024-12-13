@@ -1,0 +1,11 @@
+{
+  "name": "cadastroclientes",
+  "version": "1.0.0",
+  "description": "CRUD example with Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Hélcio Humberto",
+  "license": "MIT"
+}
