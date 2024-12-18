@@ -86,3 +86,4 @@ async function printMenu() {
 }
 
 printMenu();
+db.getCustomers();
