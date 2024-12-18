@@ -1,13 +1,16 @@
+const db = require('./db')
 const readline = require('readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
 
 const rl = readline.createInterface({ input, output });
-const customers = [];
 
 async function listCustomers() {
     console.clear();
     console.log("Clientes cadastrados:");
     console.log("Nome | CPF | Endereço");
+
+    const customers = db.getCustomers()
+
     for (let i = 0; i < customers.length; i++) {
         const customer = customers[i];
         console.log(`${customer.name} | ${customer.cpf} | ${customer.address}`);
@@ -45,12 +48,12 @@ async function startRegistration() {
     const name = await getAnswer("Qual o nome do cliente? ", "Nome inválido, tente novamente.", validateName);
     const address = await getAnswer("Qual o endereço do cliente? ", "Endereço inválido, tente novamente.", validateAddress);
     const cpf = await getAnswer("Qual o CPF do cliente? ", "CPF inválido, insira um CPF com 11 dígitos numéricos.", validateCPF);
-
-    const id = customers.length > 0 ? customers[customers.length - 1].id + 1 : 1;
-    customers.push({ id, name, address, cpf });
+    
+    const id = db.addCustomer(name, address, cpf);
 
     console.log(`Cliente cadastrado com sucesso com id ${id}!`);
     await rl.question("Pressione Enter para continuar...");
+    printMenu()
 }
 
 async function printMenu() {
