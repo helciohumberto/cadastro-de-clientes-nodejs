@@ -7,13 +7,13 @@ const rl = readline.createInterface({ input, output });
 async function listCustomers() {
     console.clear();
     console.log("Clientes cadastrados:");
-    console.log("Nome | CPF | Endereço");
+    console.log("ID | Nome | CPF | Endereço");
 
     const customers = db.getCustomers()
 
     for (let i = 0; i < customers.length; i++) {
         const customer = customers[i];
-        console.log(`${customer.name} | ${customer.cpf} | ${customer.address}`);
+        console.log(`${customer.id} | ${customer.name} | ${customer.cpf} | ${customer.address}`);
     }
     await rl.question("Pressione Enter para continuar...");
 }
@@ -32,10 +32,25 @@ function validateName(name) {
     return name.trim().indexOf(" ") !== -1; // Verifica se há pelo menos um espaço
 }
 
+function validateId(id) {
+    return id > 0;
+    
+}
+
 function validateAddress(address) {
     if (!address) return false;
     return address.length >= 10; // Endereço deve ter pelo menos 10 caracteres
 }
+
+function validateNameUpdate(name) {
+    if (!name) return true;
+    return name.trim().indexOf(" ") !== -1; // Verifica se há pelo menos um espaço
+}
+function validateAddressUpdate(address) {
+    if (!address) return true;
+    return address.length >= 10; // Endereço deve ter pelo menos 10 caracteres
+}
+
 
 function validateCPF(cpf) {
     // Validação simples para demonstrar (adapte conforme necessário)
@@ -56,24 +71,90 @@ async function startRegistration() {
     printMenu()
 }
 
+async function startUpdate() {
+    console.clear();
+
+    const id = await getAnswer("Qual o Id do cliente? ", "id inválido, tente novamente.", validateId);
+    const name = await getAnswer("Qual o novo nome do cliente? Deixe em branco para manter o mesmo.", "Nome inválido, tente novamente.", validateNameUpdate);
+    const address = await getAnswer("Qual o novo endereço do cliente? Deixe em branco para manter o mesmo.", "Endereço inválido, tente novamente.", validateAddressUpdate);
+    const cpf = await getAnswer("Qual o CPF do cliente? Deixe em branco para manter o mesmo.", "CPF inválido, insira um CPF com 11 dígitos numéricos.", validateCPF);
+    
+    const result = db.updateCustomer(id, {name, address, cpf});
+
+    if(result)
+        console.log(`Cliente atualizado com sucesso com id ${id}`);
+    else
+        console.log(`Cliente não encontrado!`);
+
+    await rl.question("Pressione Enter para continuar...");
+    printMenu()
+}
+
+function validateConfirmation(choice){
+    choice = choice.toUpperCase();
+    return choice === "S" || choice === "N";
+}
+
+async function startDelete() {
+    console.clear();
+
+    const id = await getAnswer("Qual o Id do cliente? ", "Id inválido, tente novamente.", value => Number(value) > 0);
+
+    const customer = db.getCustomer(id);
+
+    if (!customer) {
+        console.log("Cliente não encontrado!");
+        await rl.question("Pressione Enter para continuar...");
+        return;
+    }
+
+    const choice = await getAnswer(
+        `Tem certeza que deseja excluir o cliente ${customer.name}? (S/N)`, 
+        "Opção inválida, tente novamente.", 
+        validateConfirmation
+    );
+
+    if (choice.toUpperCase() === "S") {
+        const result = db.deleteCustomer(id);
+
+        if (result) {
+            console.log(`Cliente com ID ${id} excluído com sucesso!`);
+        } else {
+            console.log("Erro ao excluir cliente!");
+        }
+    }
+
+    await rl.question("Pressione Enter para continuar...");
+    printMenu();
+}
+
+
 async function printMenu() {
     while (true) {
         console.clear();
         console.log("Menu:");
-        console.log("1 - Cadastrar Cliente");
-        console.log("2 - Ver Clientes");
-        console.log("3 - Encerrar");
+        console.log("1 - Ver Clientes");
+        console.log("2 - Cadastrar Cliente");
+        console.log("3 - Editar Clientes");
+        console.log("4 - Excluir Cliente")
+        console.log("5 - Encerrar");
 
         const answer = await rl.question("Qual opção você deseja? ");
 
         switch (answer) {
-            case "1":
+            case "2":
                 await startRegistration();
                 break;
-            case "2":
+            case "1":
                 await listCustomers();
                 break;
             case "3":
+                await startUpdate();
+                break;
+            case "4":
+                await startDelete();
+                break;
+            case "5":
                 console.clear();
                 console.log("Encerrando o programa...");
                 rl.close();

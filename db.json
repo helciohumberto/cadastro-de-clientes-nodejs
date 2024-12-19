@@ -1,14 +1,1 @@
-[
-    {
-        "id": 1,
-        "name": "Hélcio Humberto",
-        "address": "Avenida Camaleão de Morais, 123",
-        "cpf": "13244486709"
-    },
-    {
-        "id": 2,
-        "name": "João Mendes",
-        "address": "Arapuca, 234",
-        "cpf": "12332198756"
-    }
-]
+[{"id":1,"name":"Hélcio Humberto","address":"Avenida Camaleão de Morais, 123","cpf":"13244486709"},{"id":2,"name":"João Mendes","address":"Arapuca, 234","cpf":"12332198756"}]
